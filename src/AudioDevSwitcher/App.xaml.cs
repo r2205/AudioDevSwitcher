@@ -1,7 +1,7 @@
+using System.Windows;
 using AudioDevSwitcher.Core.Services;
 using AudioDevSwitcher.Helpers;
 using AudioDevSwitcher.ViewModels;
-using Microsoft.UI.Xaml;
 
 namespace AudioDevSwitcher;
 
@@ -11,13 +11,10 @@ public partial class App : Application
     private MainWindow? _mainWindow;
     private IAudioDeviceService? _audioService;
 
-    public App()
+    protected override void OnStartup(StartupEventArgs e)
     {
-        InitializeComponent();
-    }
+        base.OnStartup(e);
 
-    protected override void OnLaunched(LaunchActivatedEventArgs args)
-    {
         _audioService = new AudioDeviceService();
         var viewModel = new MainViewModel(_audioService);
 
@@ -26,13 +23,13 @@ public partial class App : Application
         _trayIcon = new TrayIconHelper(_audioService, _mainWindow);
         _trayIcon.Initialize();
 
-        // Start minimized to tray – the user interacts via the tray icon.
-        // Show the window once so it's ready, then hide it.
-        _mainWindow.Activate();
+        _mainWindow.Show();
     }
 
-    public void ShowMainWindow()
+    protected override void OnExit(ExitEventArgs e)
     {
-        _mainWindow?.Activate();
+        _trayIcon?.Dispose();
+        _audioService?.Dispose();
+        base.OnExit(e);
     }
 }

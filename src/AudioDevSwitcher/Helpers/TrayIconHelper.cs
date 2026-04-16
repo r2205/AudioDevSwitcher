@@ -1,9 +1,9 @@
+using System.Windows;
+using System.Windows.Controls;
 using AudioDevSwitcher.Core.Models;
 using AudioDevSwitcher.Core.Services;
 using CommunityToolkit.Mvvm.Input;
 using H.NotifyIcon;
-using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
 
 namespace AudioDevSwitcher.Helpers;
 
@@ -25,26 +25,36 @@ public sealed class TrayIconHelper : IDisposable
 
     public void Initialize()
     {
-        var showCommand = new RelayCommand(() => _mainWindow.Activate());
-        var exitCommand = new RelayCommand(() => Application.Current.Exit());
+        var showItem = new MenuItem { Header = "Open" };
+        showItem.Click += (_, _) => ShowWindow();
 
-        var contextMenu = new MenuFlyout();
-        contextMenu.Items.Add(new MenuFlyoutItem { Text = "Open", Command = showCommand });
-        contextMenu.Items.Add(new MenuFlyoutSeparator());
-        contextMenu.Items.Add(new MenuFlyoutItem { Text = "Exit", Command = exitCommand });
+        var exitItem = new MenuItem { Header = "Exit" };
+        exitItem.Click += (_, _) => Application.Current.Shutdown();
+
+        var contextMenu = new ContextMenu();
+        contextMenu.Items.Add(showItem);
+        contextMenu.Items.Add(new Separator());
+        contextMenu.Items.Add(exitItem);
 
         _trayIcon = new TaskbarIcon
         {
             ToolTipText = "Audio Device Switcher",
+            ContextMenu = contextMenu,
             LeftClickCommand = new RelayCommand(OnTrayLeftClick),
-            DoubleClickCommand = showCommand,
-            ContextFlyout = contextMenu,
+            DoubleClickCommand = new RelayCommand(ShowWindow),
         };
 
         _trayIcon.ForceCreate();
 
         _audioService.DefaultDeviceChanged += (_, _) => UpdateTooltip();
         UpdateTooltip();
+    }
+
+    private void ShowWindow()
+    {
+        _mainWindow.Show();
+        _mainWindow.WindowState = WindowState.Normal;
+        _mainWindow.Activate();
     }
 
     private void OnTrayLeftClick()

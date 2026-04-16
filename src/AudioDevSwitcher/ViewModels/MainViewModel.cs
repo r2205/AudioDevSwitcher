@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.Windows;
 using AudioDevSwitcher.Core.Models;
 using AudioDevSwitcher.Core.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -86,13 +87,16 @@ public sealed partial class MainViewModel : ObservableObject
 
     private void OnDefaultDeviceChanged(object? sender, DefaultDeviceChangedEventArgs e)
     {
-        var collection = e.DeviceType == AudioDeviceType.Output ? OutputDevices : InputDevices;
-        MarkDefault(collection, e.DeviceId);
+        // COM notifications arrive on background threads — marshal to the UI thread.
+        Application.Current.Dispatcher.Invoke(() =>
+        {
+            var collection = e.DeviceType == AudioDeviceType.Output ? OutputDevices : InputDevices;
+            MarkDefault(collection, e.DeviceId);
+        });
     }
 
     private void OnDeviceStateChanged(object? sender, DeviceStateChangedEventArgs e)
     {
-        // A device was added/removed/changed – just refresh everything.
-        RefreshDevices();
+        Application.Current.Dispatcher.Invoke(() => RefreshDevices());
     }
 }

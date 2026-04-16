@@ -1,5 +1,4 @@
 using System.Runtime.InteropServices;
-using Microsoft.UI.Dispatching;
 
 namespace AudioDevSwitcher.Helpers;
 

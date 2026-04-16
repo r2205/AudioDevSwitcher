@@ -1,40 +1,44 @@
+using System.Windows;
 using AudioDevSwitcher.ViewModels;
-using Microsoft.UI.Xaml;
-using Microsoft.UI.Windowing;
-using Windows.Graphics;
 
 namespace AudioDevSwitcher;
 
-public sealed partial class MainWindow : Window
+public partial class MainWindow : Window
 {
     public MainViewModel ViewModel { get; }
 
     public MainWindow(MainViewModel viewModel)
     {
         ViewModel = viewModel;
+        DataContext = viewModel;
         InitializeComponent();
 
-        Title = "Audio Device Switcher";
-        ExtendsContentIntoTitleBar = true;
+        OutputList.MouseDoubleClick += (_, _) =>
+        {
+            if (OutputList.SelectedItem is AudioDeviceViewModel device)
+                ViewModel.SetOutputDeviceCommand.Execute(device);
+        };
 
-        // Set window size via AppWindow (WinUI 3 doesn't support Width/Height in XAML).
-        AppWindow.Resize(new SizeInt32(480, 560));
-
-        OutputList.IsItemClickEnabled = true;
-        InputList.IsItemClickEnabled = true;
-        OutputList.ItemClick += OnOutputItemClick;
-        InputList.ItemClick += OnInputItemClick;
+        InputList.MouseDoubleClick += (_, _) =>
+        {
+            if (InputList.SelectedItem is AudioDeviceViewModel device)
+                ViewModel.SetInputDeviceCommand.Execute(device);
+        };
     }
 
-    private void OnOutputItemClick(object sender, Microsoft.UI.Xaml.Controls.ItemClickEventArgs e)
+    protected override void OnStateChanged(EventArgs e)
     {
-        if (e.ClickedItem is AudioDeviceViewModel device)
-            ViewModel.SetOutputDeviceCommand.Execute(device);
+        // Minimize to tray instead of taskbar.
+        if (WindowState == WindowState.Minimized)
+            Hide();
+
+        base.OnStateChanged(e);
     }
 
-    private void OnInputItemClick(object sender, Microsoft.UI.Xaml.Controls.ItemClickEventArgs e)
+    protected override void OnClosing(System.ComponentModel.CancelEventArgs e)
     {
-        if (e.ClickedItem is AudioDeviceViewModel device)
-            ViewModel.SetInputDeviceCommand.Execute(device);
+        // Hide to tray instead of closing. Use the tray "Exit" to actually quit.
+        e.Cancel = true;
+        Hide();
     }
 }

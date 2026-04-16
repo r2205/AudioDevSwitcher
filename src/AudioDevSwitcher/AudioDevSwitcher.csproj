@@ -3,24 +3,13 @@
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <RootNamespace>AudioDevSwitcher</RootNamespace>
-    <UseWinUI>true</UseWinUI>
-    <WindowsPackageType>None</WindowsPackageType>
+    <UseWPF>true</UseWPF>
     <ApplicationManifest>app.manifest</ApplicationManifest>
-    <PublishAot>false</PublishAot>
-    <!-- Disable PRI / MRT resource generation so the project builds with just
-         the .NET SDK (no Visual Studio Windows app dev workload required). -->
-    <EnableMrtResourceGeneration>false</EnableMrtResourceGeneration>
-    <MrtCoreGenPriFilesOutputPath></MrtCoreGenPriFilesOutputPath>
-    <EnableMsixTooling>false</EnableMsixTooling>
-    <!-- Bundle the Windows App SDK runtime so users don't need it installed separately. -->
-    <WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.5.240627000" />
-    <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.22621.756" />
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2" />
-    <PackageReference Include="H.NotifyIcon.WinUI" Version="2.1.0" />
+    <PackageReference Include="H.NotifyIcon.Wpf" Version="2.1.0" />
   </ItemGroup>
 
   <ItemGroup>

@@ -1,6 +1,5 @@
 using AudioDevSwitcher.Core.Models;
 using CommunityToolkit.Mvvm.ComponentModel;
-using Microsoft.UI.Xaml;
 
 namespace AudioDevSwitcher.ViewModels;
 
@@ -20,10 +19,4 @@ public sealed partial class AudioDeviceViewModel : ObservableObject
         Type = device.Type;
         IsDefault = device.IsDefault;
     }
-
-    /// <summary>
-    /// Static helper for x:Bind function binding (bool -> Visibility).
-    /// </summary>
-    public static Visibility BoolToVisibility(bool value) =>
-        value ? Visibility.Visible : Visibility.Collapsed;
 }

@@ -7,9 +7,11 @@
     <WindowsPackageType>None</WindowsPackageType>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <PublishAot>false</PublishAot>
-    <!-- Disable PRI resource generation (not needed for unpackaged app, and avoids
-         requiring Visual Studio's Windows app development workload to build). -->
+    <!-- Disable PRI / MRT resource generation so the project builds with just
+         the .NET SDK (no Visual Studio Windows app dev workload required). -->
     <EnableMrtResourceGeneration>false</EnableMrtResourceGeneration>
+    <MrtCoreGenPriFilesOutputPath></MrtCoreGenPriFilesOutputPath>
+    <EnableMsixTooling>false</EnableMsixTooling>
     <!-- Bundle the Windows App SDK runtime so users don't need it installed separately. -->
     <WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
   </PropertyGroup>

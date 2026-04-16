@@ -2,22 +2,15 @@
   <!-- Workaround for building Windows App SDK projects with just the .NET CLI
        (without Visual Studio's Windows application development workload).
        The MrtCore PRI generation targets try to load a task DLL that only ships
-       with VS. Since this is an unpackaged app, PRI generation is not needed. -->
+       with VS. Since this is an unpackaged app, PRI generation is not needed.
+       We clear the properties that the targets check in their Condition attributes
+       so the ExpandPriContent task is never invoked. -->
 
   <PropertyGroup Condition="'$(WindowsPackageType)' == 'None'">
+    <EnableMrtResourceGeneration>false</EnableMrtResourceGeneration>
+    <MakePriExeFullPath></MakePriExeFullPath>
+    <MakePri></MakePri>
+    <ProjectPriFullPath></ProjectPriFullPath>
     <_MrtCoreIsGeneratePriEnabled>false</_MrtCoreIsGeneratePriEnabled>
-    <_MrtCorePriGenRunXbf>false</_MrtCorePriGenRunXbf>
-    <EnablePriGeneration>false</EnablePriGeneration>
   </PropertyGroup>
-
-  <!-- Override MRT PRI-generation targets that depend on the missing task DLL.
-       Empty targets safely replace the originals since we do not need .pri files. -->
-  <Target Name="_ExpandMrtPriContent" />
-  <Target Name="_ExpandPriContent" />
-  <Target Name="_MrtCoreExpandMrtPriContent" />
-  <Target Name="_GenerateMrtPriFiles" />
-  <Target Name="_MrtCoreGenerateMrtPriFiles" />
-  <Target Name="_GeneratePriFileFromContents" />
-  <Target Name="_GenerateMrtPriFileFromResources" />
-  <Target Name="_ExpandPriContentForPlatform" />
 </Project>

@@ -1,0 +1,54 @@
+
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AudioDevSwitcher", "src\AudioDevSwitcher\AudioDevSwitcher.csproj", "{A1B2C3D4-1234-5678-9ABC-DEF012345678}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AudioDevSwitcher.Core", "src\AudioDevSwitcher.Core\AudioDevSwitcher.Core.csproj", "{B2C3D4E5-2345-6789-ABCD-EF0123456789}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AudioDevSwitcher.Core.Tests", "tests\AudioDevSwitcher.Core.Tests\AudioDevSwitcher.Core.Tests.csproj", "{C3D4E5F6-3456-789A-BCDE-F01234567890}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{10000000-0000-0000-0000-000000000001}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{20000000-0000-0000-0000-000000000002}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Release|x64 = Release|x64
+		Debug|ARM64 = Debug|ARM64
+		Release|ARM64 = Release|ARM64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A1B2C3D4-1234-5678-9ABC-DEF012345678}.Debug|x64.ActiveCfg = Debug|x64
+		{A1B2C3D4-1234-5678-9ABC-DEF012345678}.Debug|x64.Build.0 = Debug|x64
+		{A1B2C3D4-1234-5678-9ABC-DEF012345678}.Release|x64.ActiveCfg = Release|x64
+		{A1B2C3D4-1234-5678-9ABC-DEF012345678}.Release|x64.Build.0 = Release|x64
+		{A1B2C3D4-1234-5678-9ABC-DEF012345678}.Debug|ARM64.ActiveCfg = Debug|ARM64
+		{A1B2C3D4-1234-5678-9ABC-DEF012345678}.Debug|ARM64.Build.0 = Debug|ARM64
+		{A1B2C3D4-1234-5678-9ABC-DEF012345678}.Release|ARM64.ActiveCfg = Release|ARM64
+		{A1B2C3D4-1234-5678-9ABC-DEF012345678}.Release|ARM64.Build.0 = Release|ARM64
+		{B2C3D4E5-2345-6789-ABCD-EF0123456789}.Debug|x64.ActiveCfg = Debug|x64
+		{B2C3D4E5-2345-6789-ABCD-EF0123456789}.Debug|x64.Build.0 = Debug|x64
+		{B2C3D4E5-2345-6789-ABCD-EF0123456789}.Release|x64.ActiveCfg = Release|x64
+		{B2C3D4E5-2345-6789-ABCD-EF0123456789}.Release|x64.Build.0 = Release|x64
+		{B2C3D4E5-2345-6789-ABCD-EF0123456789}.Debug|ARM64.ActiveCfg = Debug|ARM64
+		{B2C3D4E5-2345-6789-ABCD-EF0123456789}.Debug|ARM64.Build.0 = Debug|ARM64
+		{B2C3D4E5-2345-6789-ABCD-EF0123456789}.Release|ARM64.ActiveCfg = Release|ARM64
+		{B2C3D4E5-2345-6789-ABCD-EF0123456789}.Release|ARM64.Build.0 = Release|ARM64
+		{C3D4E5F6-3456-789A-BCDE-F01234567890}.Debug|x64.ActiveCfg = Debug|x64
+		{C3D4E5F6-3456-789A-BCDE-F01234567890}.Debug|x64.Build.0 = Debug|x64
+		{C3D4E5F6-3456-789A-BCDE-F01234567890}.Release|x64.ActiveCfg = Release|x64
+		{C3D4E5F6-3456-789A-BCDE-F01234567890}.Release|x64.Build.0 = Release|x64
+		{C3D4E5F6-3456-789A-BCDE-F01234567890}.Debug|ARM64.ActiveCfg = Debug|ARM64
+		{C3D4E5F6-3456-789A-BCDE-F01234567890}.Debug|ARM64.Build.0 = Debug|ARM64
+		{C3D4E5F6-3456-789A-BCDE-F01234567890}.Release|ARM64.ActiveCfg = Release|ARM64
+		{C3D4E5F6-3456-789A-BCDE-F01234567890}.Release|ARM64.Build.0 = Release|ARM64
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{A1B2C3D4-1234-5678-9ABC-DEF012345678} = {10000000-0000-0000-0000-000000000001}
+		{B2C3D4E5-2345-6789-ABCD-EF0123456789} = {10000000-0000-0000-0000-000000000001}
+		{C3D4E5F6-3456-789A-BCDE-F01234567890} = {20000000-0000-0000-0000-000000000002}
+	EndGlobalSection
+EndGlobal

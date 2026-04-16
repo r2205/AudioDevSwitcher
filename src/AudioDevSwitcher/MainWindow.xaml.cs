@@ -1,5 +1,7 @@
 using AudioDevSwitcher.ViewModels;
 using Microsoft.UI.Xaml;
+using Microsoft.UI.Windowing;
+using Windows.Graphics;
 
 namespace AudioDevSwitcher;
 
@@ -15,10 +17,13 @@ public sealed partial class MainWindow : Window
         Title = "Audio Device Switcher";
         ExtendsContentIntoTitleBar = true;
 
-        OutputList.ItemClick += OnOutputItemClick;
-        InputList.ItemClick += OnInputItemClick;
+        // Set window size via AppWindow (WinUI 3 doesn't support Width/Height in XAML).
+        AppWindow.Resize(new SizeInt32(480, 560));
+
         OutputList.IsItemClickEnabled = true;
         InputList.IsItemClickEnabled = true;
+        OutputList.ItemClick += OnOutputItemClick;
+        InputList.ItemClick += OnInputItemClick;
     }
 
     private void OnOutputItemClick(object sender, Microsoft.UI.Xaml.Controls.ItemClickEventArgs e)

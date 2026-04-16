@@ -3,8 +3,7 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:vm="using:AudioDevSwitcher.ViewModels"
-    Title="Audio Device Switcher"
-    Width="480" Height="560">
+    Title="Audio Device Switcher">
 
     <Grid Padding="24" RowSpacing="16">
         <Grid.RowDefinitions>
@@ -36,7 +35,7 @@
                                    TextTrimming="CharacterEllipsis"/>
                         <FontIcon Grid.Column="2" Glyph="&#xE73E;" FontSize="16"
                                   Foreground="{ThemeResource SystemAccentColor}"
-                                  Visibility="{x:Bind IsDefault, Mode=OneWay}"/>
+                                  Visibility="{x:Bind vm:AudioDeviceViewModel.BoolToVisibility(IsDefault), Mode=OneWay}"/>
                     </Grid>
                 </DataTemplate>
             </ListView.ItemTemplate>
@@ -63,7 +62,7 @@
                                    TextTrimming="CharacterEllipsis"/>
                         <FontIcon Grid.Column="2" Glyph="&#xE73E;" FontSize="16"
                                   Foreground="{ThemeResource SystemAccentColor}"
-                                  Visibility="{x:Bind IsDefault, Mode=OneWay}"/>
+                                  Visibility="{x:Bind vm:AudioDeviceViewModel.BoolToVisibility(IsDefault), Mode=OneWay}"/>
                     </Grid>
                 </DataTemplate>
             </ListView.ItemTemplate>

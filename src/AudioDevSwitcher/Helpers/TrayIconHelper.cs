@@ -1,14 +1,15 @@
-using System.Runtime.InteropServices;
 using AudioDevSwitcher.Core.Models;
 using AudioDevSwitcher.Core.Services;
+using CommunityToolkit.Mvvm.Input;
 using H.NotifyIcon;
-using H.NotifyIcon.Core;
 using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
 
 namespace AudioDevSwitcher.Helpers;
 
 /// <summary>
 /// Manages the system tray icon and its context menu for quick device switching.
+/// Left-click cycles the output device. Right-click shows a menu with "Open" and "Exit".
 /// </summary>
 public sealed class TrayIconHelper : IDisposable
 {
@@ -24,33 +25,33 @@ public sealed class TrayIconHelper : IDisposable
 
     public void Initialize()
     {
+        var showCommand = new RelayCommand(() => _mainWindow.Activate());
+        var exitCommand = new RelayCommand(() => Application.Current.Exit());
+
+        var contextMenu = new MenuFlyout();
+        contextMenu.Items.Add(new MenuFlyoutItem { Text = "Open", Command = showCommand });
+        contextMenu.Items.Add(new MenuFlyoutSeparator());
+        contextMenu.Items.Add(new MenuFlyoutItem { Text = "Exit", Command = exitCommand });
+
         _trayIcon = new TaskbarIcon
         {
             ToolTipText = "Audio Device Switcher",
+            LeftClickCommand = new RelayCommand(OnTrayLeftClick),
+            DoubleClickCommand = showCommand,
+            ContextFlyout = contextMenu,
         };
 
-        // Use the application icon embedded in the exe; falls back to a default.
         _trayIcon.ForceCreate();
-
-        _trayIcon.ContextMenuMode = H.NotifyIcon.ContextMenuMode.SecondWindow;
-        _trayIcon.TrayLeftMouseDown += OnTrayLeftClick;
-        _trayIcon.TrayRightMouseDown += OnTrayRightClick;
 
         _audioService.DefaultDeviceChanged += (_, _) => UpdateTooltip();
         UpdateTooltip();
     }
 
-    private void OnTrayLeftClick(object? sender, RoutedEventArgs e)
+    private void OnTrayLeftClick()
     {
-        // Left-click cycles the output device for fast switching.
         var next = _audioService.CycleDevice(AudioDeviceType.Output);
         if (next is not null)
             UpdateTooltip(next.Name);
-    }
-
-    private void OnTrayRightClick(object? sender, RoutedEventArgs e)
-    {
-        _mainWindow.Activate();
     }
 
     private void UpdateTooltip(string? deviceName = null)

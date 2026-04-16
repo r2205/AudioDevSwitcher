@@ -7,6 +7,11 @@
     <WindowsPackageType>None</WindowsPackageType>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <PublishAot>false</PublishAot>
+    <!-- Disable PRI resource generation (not needed for unpackaged app, and avoids
+         requiring Visual Studio's Windows app development workload to build). -->
+    <EnableMrtResourceGeneration>false</EnableMrtResourceGeneration>
+    <!-- Bundle the Windows App SDK runtime so users don't need it installed separately. -->
+    <WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
   </PropertyGroup>
 
   <ItemGroup>

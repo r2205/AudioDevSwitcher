@@ -5,7 +5,12 @@
     <RootNamespace>AudioDevSwitcher</RootNamespace>
     <UseWPF>true</UseWPF>
     <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationIcon>app.ico</ApplicationIcon>
   </PropertyGroup>
+
+  <Target Name="GenerateAppIcon" BeforeTargets="BeforeBuild" Condition="!Exists('app.ico')">
+    <Exec Command="dotnet run --project $(MSBuildThisFileDirectory)..\..\tools\GenerateIcon.csproj -- $(MSBuildThisFileDirectory)app.ico" />
+  </Target>
 
   <ItemGroup>
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2" />

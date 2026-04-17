@@ -41,6 +41,9 @@ ehthumbs.db
 Desktop.ini
 $RECYCLE.BIN/
 
+## Generated files
+src/AudioDevSwitcher/app.ico
+
 ## Publish output
 publish/
 

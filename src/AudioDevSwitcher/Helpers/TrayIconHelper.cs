@@ -1,3 +1,7 @@
+using System.Drawing;
+using System.Drawing.Drawing2D;
+using System.Drawing.Text;
+using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Controls;
 using AudioDevSwitcher.Core.Models;
@@ -13,9 +17,14 @@ namespace AudioDevSwitcher.Helpers;
 /// </summary>
 public sealed class TrayIconHelper : IDisposable
 {
+    [DllImport("user32.dll", SetLastError = true)]
+    private static extern bool DestroyIcon(IntPtr handle);
+
     private readonly IAudioDeviceService _audioService;
     private readonly Window _mainWindow;
     private TaskbarIcon? _trayIcon;
+    private Icon? _icon;
+    private IntPtr _iconHandle;
 
     public TrayIconHelper(IAudioDeviceService audioService, Window mainWindow)
     {
@@ -36,9 +45,12 @@ public sealed class TrayIconHelper : IDisposable
         contextMenu.Items.Add(new Separator());
         contextMenu.Items.Add(exitItem);
 
+        _icon = CreateSpeakerIcon();
+
         _trayIcon = new TaskbarIcon
         {
             ToolTipText = "Audio Device Switcher",
+            Icon = _icon,
             ContextMenu = contextMenu,
             LeftClickCommand = new RelayCommand(OnTrayLeftClick),
             DoubleClickCommand = new RelayCommand(ShowWindow),
@@ -76,8 +88,46 @@ public sealed class TrayIconHelper : IDisposable
             _trayIcon.ToolTipText = $"Output: {deviceName}";
     }
 
+    /// <summary>
+    /// Builds a 32x32 tray icon showing a speaker glyph on a blue circle.
+    /// Uses Segoe MDL2 Assets (always present on Windows 10/11).
+    /// </summary>
+    private Icon CreateSpeakerIcon()
+    {
+        const int size = 32;
+        using var bitmap = new Bitmap(size, size);
+        using (var g = Graphics.FromImage(bitmap))
+        {
+            g.SmoothingMode = SmoothingMode.AntiAlias;
+            g.TextRenderingHint = TextRenderingHint.AntiAlias;
+            g.Clear(Color.Transparent);
+
+            using var bgBrush = new SolidBrush(Color.FromArgb(0, 120, 212));
+            g.FillEllipse(bgBrush, 0, 0, size - 1, size - 1);
+
+            using var font = new Font("Segoe MDL2 Assets", 16, FontStyle.Regular, GraphicsUnit.Pixel);
+            using var textBrush = new SolidBrush(Color.White);
+            var sf = new StringFormat
+            {
+                Alignment = StringAlignment.Center,
+                LineAlignment = StringAlignment.Center,
+            };
+            // U+E767 = Volume (speaker) glyph in Segoe MDL2 Assets
+            g.DrawString("\uE767", font, textBrush, new RectangleF(0, 0, size, size), sf);
+        }
+
+        _iconHandle = bitmap.GetHicon();
+        return Icon.FromHandle(_iconHandle);
+    }
+
     public void Dispose()
     {
         _trayIcon?.Dispose();
+        _icon?.Dispose();
+        if (_iconHandle != IntPtr.Zero)
+        {
+            DestroyIcon(_iconHandle);
+            _iconHandle = IntPtr.Zero;
+        }
     }
 }

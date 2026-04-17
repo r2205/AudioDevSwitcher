@@ -105,7 +105,7 @@ public sealed class TrayIconHelper : IDisposable
             using var bgBrush = new SolidBrush(Color.FromArgb(0, 120, 212));
             g.FillEllipse(bgBrush, 0, 0, size - 1, size - 1);
 
-            using var font = new Font("Segoe MDL2 Assets", 16, FontStyle.Regular, GraphicsUnit.Pixel);
+            using var font = new System.Drawing.Font("Segoe MDL2 Assets", 16f, System.Drawing.FontStyle.Regular, GraphicsUnit.Pixel);
             using var textBrush = new SolidBrush(Color.White);
             var sf = new StringFormat
             {

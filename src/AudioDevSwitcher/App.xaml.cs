@@ -10,20 +10,27 @@ public partial class App : Application
     private TrayIconHelper? _trayIcon;
     private MainWindow? _mainWindow;
     private IAudioDeviceService? _audioService;
+    private ISettingsService? _settingsService;
 
     protected override void OnStartup(StartupEventArgs e)
     {
         base.OnStartup(e);
 
+        _settingsService = new SettingsService();
         _audioService = new AudioDeviceService();
-        var viewModel = new MainViewModel(_audioService);
+        var viewModel = new MainViewModel(_audioService, _settingsService);
 
         _mainWindow = new MainWindow(viewModel);
 
-        _trayIcon = new TrayIconHelper(_audioService, _mainWindow);
+        _trayIcon = new TrayIconHelper(_audioService, _mainWindow, _settingsService);
         _trayIcon.Initialize();
 
-        _mainWindow.Show();
+        bool launchHidden =
+            _settingsService.Settings.StartMinimized ||
+            e.Args.Any(a => string.Equals(a, "--minimized", StringComparison.OrdinalIgnoreCase));
+
+        if (!launchHidden)
+            _mainWindow.Show();
     }
 
     protected override void OnExit(ExitEventArgs e)

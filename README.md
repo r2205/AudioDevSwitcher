@@ -17,6 +17,10 @@ A lightweight Windows 11 system-tray app that lets you quickly switch your defau
 - **Real-time updates** — detects when devices are plugged in or removed
 - **Minimize/close to tray** — the app stays running in the background
 - **Tooltip** shows the current default output device
+- **Configurable settings** (persisted to `%APPDATA%\AudioDevSwitcher\settings.json`):
+  - Start with Windows (adds a per-user `HKCU\...\Run` entry)
+  - Start minimized to tray
+  - Confirmation tone when switching output — a short "ding" plays through the newly-selected device
 
 ## Requirements
 

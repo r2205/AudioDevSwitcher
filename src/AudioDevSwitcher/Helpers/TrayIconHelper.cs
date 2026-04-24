@@ -51,7 +51,7 @@ public sealed class TrayIconHelper : IDisposable
 
         _trayIcon = new TaskbarIcon
         {
-            ToolTipText = "Audio Device Switcher",
+            ToolTipText = MainWindow.AppTitle,
             Icon = _icon,
             ContextMenu = contextMenu,
             LeftClickCommand = new RelayCommand(OnTrayLeftClick),
@@ -91,7 +91,7 @@ public sealed class TrayIconHelper : IDisposable
         }
 
         if (_trayIcon is not null)
-            _trayIcon.ToolTipText = $"Output: {deviceName}";
+            _trayIcon.ToolTipText = $"{MainWindow.AppTitle}\nOutput: {deviceName}";
     }
 
     /// <summary>

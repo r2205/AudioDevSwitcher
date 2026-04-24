@@ -1,3 +1,4 @@
+using System.Reflection;
 using System.Windows;
 using AudioDevSwitcher.ViewModels;
 
@@ -5,6 +6,17 @@ namespace AudioDevSwitcher;
 
 public partial class MainWindow : Window
 {
+    public const string AppName = "David's Audio Device Switcher";
+
+    public static string AppVersion
+    {
+        get
+        {
+            var v = Assembly.GetExecutingAssembly().GetName().Version;
+            return v is not null ? $"v{v.Major}.{v.Minor}.{v.Build}" : "v0.0.0";
+        }
+    }
+
     public MainViewModel ViewModel { get; }
 
     public MainWindow(MainViewModel viewModel)
@@ -12,6 +24,8 @@ public partial class MainWindow : Window
         ViewModel = viewModel;
         DataContext = viewModel;
         InitializeComponent();
+        Title = AppName;
+        VersionLabel.Text = AppVersion;
 
         OutputList.MouseDoubleClick += (_, _) =>
         {

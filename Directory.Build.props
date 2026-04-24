@@ -6,5 +6,17 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Platforms>x64;ARM64</Platforms>
     <RuntimeIdentifiers>win-x64;win-arm64</RuntimeIdentifiers>
+    <VersionPrefix>1.2</VersionPrefix>
   </PropertyGroup>
+
+  <Target Name="SetPatchFromGit" BeforeTargets="GetAssemblyVersion;GenerateAssemblyInfo" Condition="'$(DesignTimeBuild)' != 'true'">
+    <Exec Command="git rev-list --count HEAD" ConsoleToMSBuild="true" StandardOutputImportance="low">
+      <Output TaskParameter="ConsoleOutput" PropertyName="GitCommitCount" />
+    </Exec>
+    <PropertyGroup>
+      <Version>$(VersionPrefix).$(GitCommitCount)</Version>
+      <AssemblyVersion>$(VersionPrefix).$(GitCommitCount).0</AssemblyVersion>
+      <FileVersion>$(VersionPrefix).$(GitCommitCount).0</FileVersion>
+    </PropertyGroup>
+  </Target>
 </Project>

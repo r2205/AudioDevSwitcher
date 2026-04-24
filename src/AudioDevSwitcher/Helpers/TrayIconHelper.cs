@@ -51,7 +51,7 @@ public sealed class TrayIconHelper : IDisposable
 
         _trayIcon = new TaskbarIcon
         {
-            ToolTipText = MainWindow.AppTitle,
+            ToolTipText = MainWindow.AppName,
             Icon = _icon,
             ContextMenu = contextMenu,
             LeftClickCommand = new RelayCommand(OnTrayLeftClick),
@@ -91,7 +91,7 @@ public sealed class TrayIconHelper : IDisposable
         }
 
         if (_trayIcon is not null)
-            _trayIcon.ToolTipText = $"{MainWindow.AppTitle}\nOutput: {deviceName}";
+            _trayIcon.ToolTipText = $"{MainWindow.AppName}\nOutput: {deviceName}";
     }
 
     /// <summary>

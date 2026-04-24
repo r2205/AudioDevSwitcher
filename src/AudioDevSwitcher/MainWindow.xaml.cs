@@ -6,13 +6,14 @@ namespace AudioDevSwitcher;
 
 public partial class MainWindow : Window
 {
-    public static string AppTitle
+    public const string AppName = "David's Audio Device Switcher";
+
+    public static string AppVersion
     {
         get
         {
             var v = Assembly.GetExecutingAssembly().GetName().Version;
-            var ver = v is not null ? $"{v.Major}.{v.Minor}" : "0.0";
-            return $"David's Audio Device Switcher v.{ver}";
+            return v is not null ? $"v{v.Major}.{v.Minor}.{v.Build}" : "v0.0.0";
         }
     }
 
@@ -23,7 +24,8 @@ public partial class MainWindow : Window
         ViewModel = viewModel;
         DataContext = viewModel;
         InitializeComponent();
-        Title = AppTitle;
+        Title = AppName;
+        VersionLabel.Text = AppVersion;
 
         OutputList.MouseDoubleClick += (_, _) =>
         {

@@ -14,6 +14,7 @@
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
         <!-- Output Devices -->
@@ -89,6 +90,10 @@
         <StackPanel Grid.Row="5" Orientation="Horizontal" HorizontalAlignment="Right">
             <Button Content="Refresh" Padding="16,6" Command="{Binding RefreshDevicesCommand}"/>
         </StackPanel>
+
+        <!-- Version -->
+        <TextBlock Grid.Row="6" x:Name="VersionLabel" HorizontalAlignment="Right"
+                   Foreground="Gray" FontSize="11" Margin="0,8,0,0"/>
     </Grid>
 
 </Window>

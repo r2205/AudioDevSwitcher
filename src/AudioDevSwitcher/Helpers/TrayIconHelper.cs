@@ -22,14 +22,16 @@ public sealed class TrayIconHelper : IDisposable
 
     private readonly IAudioDeviceService _audioService;
     private readonly Window _mainWindow;
+    private readonly ISettingsService _settingsService;
     private TaskbarIcon? _trayIcon;
     private Icon? _icon;
     private IntPtr _iconHandle;
 
-    public TrayIconHelper(IAudioDeviceService audioService, Window mainWindow)
+    public TrayIconHelper(IAudioDeviceService audioService, Window mainWindow, ISettingsService settingsService)
     {
         _audioService = audioService;
         _mainWindow = mainWindow;
+        _settingsService = settingsService;
     }
 
     public void Initialize()
@@ -73,7 +75,11 @@ public sealed class TrayIconHelper : IDisposable
     {
         var next = _audioService.CycleDevice(AudioDeviceType.Output);
         if (next is not null)
+        {
             UpdateTooltip(next.Name);
+            if (_settingsService.Settings.PlayConfirmationTone)
+                ConfirmationTonePlayer.PlayAsync();
+        }
     }
 
     private void UpdateTooltip(string? deviceName = null)

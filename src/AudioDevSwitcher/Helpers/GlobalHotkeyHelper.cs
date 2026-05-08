@@ -58,6 +58,19 @@ public sealed class GlobalHotkeyHelper : IDisposable
         }
     }
 
+    /// <summary>
+    /// HwndSource hook callback. Pass to <c>HwndSource.AddHook</c>.
+    /// </summary>
+    public IntPtr HookHandler(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
+    {
+        if (msg == WM_HOTKEY)
+        {
+            HandleHotkeyMessage(wParam.ToInt32());
+            handled = true;
+        }
+        return IntPtr.Zero;
+    }
+
     public void Dispose()
     {
         if (_registered && _hwnd != IntPtr.Zero)

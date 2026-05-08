@@ -1,4 +1,4 @@
-# Audio Device Switcher
+# David's Audio Device Switcher
 
 A lightweight Windows 11 system-tray app that lets you quickly switch your default audio output and input devices.
 
@@ -21,6 +21,7 @@ A lightweight Windows 11 system-tray app that lets you quickly switch your defau
   - Start with Windows (adds a per-user `HKCU\...\Run` entry)
   - Start minimized to tray
   - Confirmation tone when switching output — a short "ding" plays through the newly-selected device
+- **Version label** in the bottom-right corner (e.g. `v1.2.34`). The patch number is auto-incremented from the git commit count, so every commit bumps it. Bump `<VersionPrefix>` in `Directory.Build.props` for major/minor releases.
 
 ## Requirements
 

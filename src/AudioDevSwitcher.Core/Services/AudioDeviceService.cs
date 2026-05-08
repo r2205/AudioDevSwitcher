@@ -71,7 +71,7 @@ public sealed class AudioDeviceService : IAudioDeviceService, IMMNotificationCli
     public AudioDevice? CycleDevice(AudioDeviceType type)
     {
         var devices = GetDevices(type);
-        if (devices.Count <= 1) return devices.FirstOrDefault();
+        if (devices.Count <= 1) return null;
 
         int currentIndex = -1;
         for (int i = 0; i < devices.Count; i++)

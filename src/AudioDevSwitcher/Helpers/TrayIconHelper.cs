@@ -60,7 +60,10 @@ public sealed class TrayIconHelper : IDisposable
 
         _trayIcon.ForceCreate();
 
-        _audioService.DefaultDeviceChanged += (_, _) => UpdateTooltip();
+        // COM notifications arrive on background threads — marshal to UI thread
+        // before touching the TaskbarIcon's DependencyProperty.
+        _audioService.DefaultDeviceChanged += (_, _) =>
+            Application.Current?.Dispatcher.BeginInvoke(() => UpdateTooltip());
         UpdateTooltip();
     }
 

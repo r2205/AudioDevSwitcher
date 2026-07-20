@@ -76,7 +76,17 @@ public sealed class TrayIconHelper : IDisposable
 
     private void OnTrayLeftClick()
     {
-        var next = _audioService.CycleDevice(AudioDeviceType.Output);
+        AudioDevice? next;
+        try
+        {
+            next = _audioService.CycleDevice(AudioDeviceType.Output);
+        }
+        catch (COMException)
+        {
+            // A device vanished mid-cycle; the next click retries.
+            return;
+        }
+
         if (next is not null)
         {
             UpdateTooltip(next.Name);

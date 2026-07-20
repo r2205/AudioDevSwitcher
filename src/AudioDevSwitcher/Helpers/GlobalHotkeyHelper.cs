@@ -25,7 +25,8 @@ public sealed class GlobalHotkeyHelper : IDisposable
     private static extern bool UnregisterHotKey(IntPtr hWnd, int id);
 
     private IntPtr _hwnd;
-    private bool _registered;
+    private bool _outputRegistered;
+    private bool _inputRegistered;
 
     public event Action? CycleOutputRequested;
     public event Action? CycleInputRequested;
@@ -37,9 +38,11 @@ public sealed class GlobalHotkeyHelper : IDisposable
     {
         _hwnd = hwnd;
 
-        _registered =
-            RegisterHotKey(hwnd, HOTKEY_CYCLE_OUTPUT, MOD_CONTROL | MOD_ALT, VK_PRIOR) &&
-            RegisterHotKey(hwnd, HOTKEY_CYCLE_INPUT, MOD_CONTROL | MOD_ALT, VK_NEXT);
+        // Register and track each hotkey independently: a conflict on one combo
+        // (another app already owns it) must not cost the user the other one,
+        // and Dispose must unregister exactly what was registered.
+        _outputRegistered = RegisterHotKey(hwnd, HOTKEY_CYCLE_OUTPUT, MOD_CONTROL | MOD_ALT, VK_PRIOR);
+        _inputRegistered = RegisterHotKey(hwnd, HOTKEY_CYCLE_INPUT, MOD_CONTROL | MOD_ALT, VK_NEXT);
     }
 
     /// <summary>
@@ -73,11 +76,18 @@ public sealed class GlobalHotkeyHelper : IDisposable
 
     public void Dispose()
     {
-        if (_registered && _hwnd != IntPtr.Zero)
+        if (_hwnd == IntPtr.Zero) return;
+
+        if (_outputRegistered)
         {
             UnregisterHotKey(_hwnd, HOTKEY_CYCLE_OUTPUT);
+            _outputRegistered = false;
+        }
+
+        if (_inputRegistered)
+        {
             UnregisterHotKey(_hwnd, HOTKEY_CYCLE_INPUT);
-            _registered = false;
+            _inputRegistered = false;
         }
     }
 }

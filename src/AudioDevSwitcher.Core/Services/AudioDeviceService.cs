@@ -165,12 +165,14 @@ public sealed class AudioDeviceService : IAudioDeviceService, IMMNotificationCli
         var nameKey = PropertyKeys.DeviceFriendlyName;
         props.GetValue(ref nameKey, out var nameProp);
         string name = nameProp.AsString();
+        nameProp.Clear();
 
         if (string.IsNullOrWhiteSpace(name))
         {
             var descKey = PropertyKeys.DeviceDescription;
             props.GetValue(ref descKey, out var descProp);
             name = descProp.AsString();
+            descProp.Clear();
         }
 
         if (string.IsNullOrWhiteSpace(name))

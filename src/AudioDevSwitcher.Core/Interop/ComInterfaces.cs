@@ -67,6 +67,16 @@ internal struct PropVariant
             return Marshal.PtrToStringUni(Value) ?? string.Empty;
         return string.Empty;
     }
+
+    /// <summary>
+    /// Frees the native memory this PROPVARIANT owns. IPropertyStore::GetValue
+    /// transfers ownership to the caller, so every received value must be
+    /// cleared after reading or the native allocation leaks.
+    /// </summary>
+    public void Clear() => PropVariantClear(ref this);
+
+    [DllImport("ole32.dll")]
+    private static extern int PropVariantClear(ref PropVariant pvar);
 }
 
 // ── IMMDeviceEnumerator ──────────────────────────────────────────────

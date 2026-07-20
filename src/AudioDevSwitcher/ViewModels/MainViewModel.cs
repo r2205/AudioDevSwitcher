@@ -136,10 +136,14 @@ public sealed partial class MainViewModel : ObservableObject
             d.IsDefault = string.Equals(d.Id, deviceId, StringComparison.OrdinalIgnoreCase);
     }
 
+    // COM notifications arrive on background threads — marshal to the UI thread.
+    // Must be BeginInvoke, not Invoke: IMMNotificationClient callbacks may not
+    // block, and a synchronous wait here deadlocks against a UI thread that is
+    // re-entering MMDevAPI (enumeration, or Dispose's callback unregistration).
+
     private void OnDefaultDeviceChanged(object? sender, DefaultDeviceChangedEventArgs e)
     {
-        // COM notifications arrive on background threads — marshal to the UI thread.
-        Application.Current.Dispatcher.Invoke(() =>
+        Application.Current?.Dispatcher.BeginInvoke(() =>
         {
             var collection = e.DeviceType == AudioDeviceType.Output ? OutputDevices : InputDevices;
             MarkDefault(collection, e.DeviceId);
@@ -148,6 +152,6 @@ public sealed partial class MainViewModel : ObservableObject
 
     private void OnDeviceStateChanged(object? sender, DeviceStateChangedEventArgs e)
     {
-        Application.Current.Dispatcher.Invoke(() => RefreshDevices());
+        Application.Current?.Dispatcher.BeginInvoke(() => RefreshDevices());
     }
 }

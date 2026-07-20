@@ -54,6 +54,12 @@ internal struct PropVariant
     private ushort _reserved3;
     public IntPtr Value;
 
+    // The native union is two pointers wide (e.g. CALPWSTR/BLOB), so the struct
+    // must be sizeof(PROPVARIANT) — 24 bytes on x64, 16 on x86. Without this
+    // padding, IPropertyStore::GetValue writes 8 bytes past the struct and
+    // corrupts the caller's stack frame.
+    private IntPtr _padding;
+
     public readonly string AsString()
     {
         // VT_LPWSTR = 31

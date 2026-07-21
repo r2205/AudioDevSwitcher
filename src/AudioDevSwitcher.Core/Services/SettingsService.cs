@@ -27,14 +27,31 @@ public sealed class SettingsService : ISettingsService
         if (!File.Exists(_path))
             return new AppSettings();
 
-        try
+        // A transient sharing violation (antivirus/backup/sync briefly locking
+        // the file) must not be mistaken for corruption: the defaults loaded
+        // here become the live Settings object, and the next Save would
+        // persist them over the user's real file. Retry the read before
+        // falling back.
+        for (int attempt = 0; ; attempt++)
         {
-            var json = File.ReadAllText(_path);
-            return JsonSerializer.Deserialize<AppSettings>(json) ?? new AppSettings();
-        }
-        catch
-        {
-            return new AppSettings();
+            try
+            {
+                var json = File.ReadAllText(_path);
+                return JsonSerializer.Deserialize<AppSettings>(json) ?? new AppSettings();
+            }
+            catch (JsonException)
+            {
+                // Genuinely corrupt content — defaults are the right answer.
+                return new AppSettings();
+            }
+            catch (IOException) when (attempt < 3)
+            {
+                Thread.Sleep(100);
+            }
+            catch
+            {
+                return new AppSettings();
+            }
         }
     }
 

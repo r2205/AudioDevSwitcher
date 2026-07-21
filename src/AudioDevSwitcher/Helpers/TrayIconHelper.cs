@@ -70,13 +70,28 @@ public sealed class TrayIconHelper : IDisposable
     private void ShowWindow()
     {
         _mainWindow.Show();
-        _mainWindow.WindowState = WindowState.Normal;
+
+        // Undo minimize-to-tray, but leave a maximized window maximized —
+        // hiding to tray on close does not change WindowState.
+        if (_mainWindow.WindowState == WindowState.Minimized)
+            _mainWindow.WindowState = WindowState.Normal;
+
         _mainWindow.Activate();
     }
 
     private void OnTrayLeftClick()
     {
-        var next = _audioService.CycleDevice(AudioDeviceType.Output);
+        AudioDevice? next;
+        try
+        {
+            next = _audioService.CycleDevice(AudioDeviceType.Output);
+        }
+        catch (COMException)
+        {
+            // A device vanished mid-cycle; the next click retries.
+            return;
+        }
+
         if (next is not null)
         {
             UpdateTooltip(next.Name);
@@ -94,7 +109,10 @@ public sealed class TrayIconHelper : IDisposable
         }
 
         if (_trayIcon is not null)
-            _trayIcon.ToolTipText = $"{MainWindow.AppName}\nOutput: {deviceName}";
+            _trayIcon.ToolTipText =
+                $"{MainWindow.AppName}\nOutput: {deviceName}\n" +
+                $"{GlobalHotkeyHelper.CycleOutputGesture}: next output\n" +
+                $"{GlobalHotkeyHelper.CycleInputGesture}: next input";
     }
 
     /// <summary>

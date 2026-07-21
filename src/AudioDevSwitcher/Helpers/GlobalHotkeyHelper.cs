@@ -12,11 +12,16 @@ public sealed class GlobalHotkeyHelper : IDisposable
     private const int WM_HOTKEY = 0x0312;
     private const int MOD_CONTROL = 0x0002;
     private const int MOD_ALT = 0x0001;
+    private const int MOD_NOREPEAT = 0x4000;
     private const int VK_PRIOR = 0x21;  // Page Up
     private const int VK_NEXT = 0x22;   // Page Down
 
     private const int HOTKEY_CYCLE_OUTPUT = 1;
     private const int HOTKEY_CYCLE_INPUT = 2;
+
+    // Display strings for UI hints; keep in sync with the Register calls below.
+    public const string CycleOutputGesture = "Ctrl+Alt+PgUp";
+    public const string CycleInputGesture = "Ctrl+Alt+PgDn";
 
     [DllImport("user32.dll", SetLastError = true)]
     private static extern bool RegisterHotKey(IntPtr hWnd, int id, int modifiers, int vk);
@@ -25,7 +30,8 @@ public sealed class GlobalHotkeyHelper : IDisposable
     private static extern bool UnregisterHotKey(IntPtr hWnd, int id);
 
     private IntPtr _hwnd;
-    private bool _registered;
+    private bool _outputRegistered;
+    private bool _inputRegistered;
 
     public event Action? CycleOutputRequested;
     public event Action? CycleInputRequested;
@@ -37,9 +43,14 @@ public sealed class GlobalHotkeyHelper : IDisposable
     {
         _hwnd = hwnd;
 
-        _registered =
-            RegisterHotKey(hwnd, HOTKEY_CYCLE_OUTPUT, MOD_CONTROL | MOD_ALT, VK_PRIOR) &&
-            RegisterHotKey(hwnd, HOTKEY_CYCLE_INPUT, MOD_CONTROL | MOD_ALT, VK_NEXT);
+        // Register and track each hotkey independently: a conflict on one combo
+        // (another app already owns it) must not cost the user the other one,
+        // and Dispose must unregister exactly what was registered.
+        // MOD_NOREPEAT: cycling is not idempotent, so keyboard auto-repeat
+        // while the chord is held must not fire the hotkey again.
+        const int modifiers = MOD_CONTROL | MOD_ALT | MOD_NOREPEAT;
+        _outputRegistered = RegisterHotKey(hwnd, HOTKEY_CYCLE_OUTPUT, modifiers, VK_PRIOR);
+        _inputRegistered = RegisterHotKey(hwnd, HOTKEY_CYCLE_INPUT, modifiers, VK_NEXT);
     }
 
     /// <summary>
@@ -73,11 +84,18 @@ public sealed class GlobalHotkeyHelper : IDisposable
 
     public void Dispose()
     {
-        if (_registered && _hwnd != IntPtr.Zero)
+        if (_hwnd == IntPtr.Zero) return;
+
+        if (_outputRegistered)
         {
             UnregisterHotKey(_hwnd, HOTKEY_CYCLE_OUTPUT);
+            _outputRegistered = false;
+        }
+
+        if (_inputRegistered)
+        {
             UnregisterHotKey(_hwnd, HOTKEY_CYCLE_INPUT);
-            _registered = false;
+            _inputRegistered = false;
         }
     }
 }

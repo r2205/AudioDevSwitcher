@@ -54,6 +54,12 @@ internal struct PropVariant
     private ushort _reserved3;
     public IntPtr Value;
 
+    // The native union is two pointers wide (e.g. CALPWSTR/BLOB), so the struct
+    // must be sizeof(PROPVARIANT) — 24 bytes on x64, 16 on x86. Without this
+    // padding, IPropertyStore::GetValue writes 8 bytes past the struct and
+    // corrupts the caller's stack frame.
+    private IntPtr _padding;
+
     public readonly string AsString()
     {
         // VT_LPWSTR = 31
@@ -61,6 +67,16 @@ internal struct PropVariant
             return Marshal.PtrToStringUni(Value) ?? string.Empty;
         return string.Empty;
     }
+
+    /// <summary>
+    /// Frees the native memory this PROPVARIANT owns. IPropertyStore::GetValue
+    /// transfers ownership to the caller, so every received value must be
+    /// cleared after reading or the native allocation leaks.
+    /// </summary>
+    public void Clear() => PropVariantClear(ref this);
+
+    [DllImport("ole32.dll")]
+    private static extern int PropVariantClear(ref PropVariant pvar);
 }
 
 // ── IMMDeviceEnumerator ──────────────────────────────────────────────

@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.Runtime.InteropServices;
 using System.Windows;
 using AudioDevSwitcher.Core.Models;
 using AudioDevSwitcher.Core.Services;
@@ -74,7 +75,7 @@ public sealed partial class MainViewModel : ObservableObject
     [RelayCommand]
     private void SetOutputDevice(AudioDeviceViewModel device)
     {
-        _audioService.SetDefaultDevice(device.Id);
+        if (!TrySetDefault(device.Id)) return;
         MarkDefault(OutputDevices, device.Id);
         PlayToneIfEnabled();
     }
@@ -82,14 +83,14 @@ public sealed partial class MainViewModel : ObservableObject
     [RelayCommand]
     private void SetInputDevice(AudioDeviceViewModel device)
     {
-        _audioService.SetDefaultDevice(device.Id);
+        if (!TrySetDefault(device.Id)) return;
         MarkDefault(InputDevices, device.Id);
     }
 
     [RelayCommand]
     private void CycleOutputDevice()
     {
-        var next = _audioService.CycleDevice(AudioDeviceType.Output);
+        var next = TryCycle(AudioDeviceType.Output);
         if (next is not null)
         {
             MarkDefault(OutputDevices, next.Id);
@@ -100,19 +101,60 @@ public sealed partial class MainViewModel : ObservableObject
     [RelayCommand]
     private void CycleInputDevice()
     {
-        var next = _audioService.CycleDevice(AudioDeviceType.Input);
+        var next = TryCycle(AudioDeviceType.Input);
         if (next is not null)
             MarkDefault(InputDevices, next.Id);
+    }
+
+    // COM failures on these paths are ordinary races — the targeted device was
+    // unplugged or powered off after the list was built. Recover by
+    // re-enumerating instead of letting the exception kill the app.
+
+    private bool TrySetDefault(string deviceId)
+    {
+        try
+        {
+            _audioService.SetDefaultDevice(deviceId);
+            return true;
+        }
+        catch (COMException)
+        {
+            RefreshDevices();
+            return false;
+        }
+    }
+
+    private AudioDevice? TryCycle(AudioDeviceType type)
+    {
+        try
+        {
+            return _audioService.CycleDevice(type);
+        }
+        catch (COMException)
+        {
+            RefreshDevices();
+            return null;
+        }
     }
 
     [RelayCommand]
     private void RefreshDevices()
     {
+        // Rebuilding the collections resets the ListView selection; keep the
+        // user's selected row when its device survives the refresh, otherwise
+        // fall back to highlighting the default device.
+        var prevOutputId = SelectedOutputDevice?.Id;
+        var prevInputId = SelectedInputDevice?.Id;
+
         LoadDevices(AudioDeviceType.Output, OutputDevices);
         LoadDevices(AudioDeviceType.Input, InputDevices);
 
-        SelectedOutputDevice = OutputDevices.FirstOrDefault(d => d.IsDefault);
-        SelectedInputDevice = InputDevices.FirstOrDefault(d => d.IsDefault);
+        SelectedOutputDevice =
+            OutputDevices.FirstOrDefault(d => string.Equals(d.Id, prevOutputId, StringComparison.OrdinalIgnoreCase))
+            ?? OutputDevices.FirstOrDefault(d => d.IsDefault);
+        SelectedInputDevice =
+            InputDevices.FirstOrDefault(d => string.Equals(d.Id, prevInputId, StringComparison.OrdinalIgnoreCase))
+            ?? InputDevices.FirstOrDefault(d => d.IsDefault);
     }
 
     private void PlayToneIfEnabled()
@@ -123,8 +165,20 @@ public sealed partial class MainViewModel : ObservableObject
 
     private void LoadDevices(AudioDeviceType type, ObservableCollection<AudioDeviceViewModel> target)
     {
+        IReadOnlyList<AudioDevice> devices;
+        try
+        {
+            devices = _audioService.GetDevices(type);
+        }
+        catch (COMException)
+        {
+            // Transient enumeration failure (e.g. the audio service restarting).
+            // Keep the current list; the next device notification retries.
+            return;
+        }
+
         target.Clear();
-        foreach (var device in _audioService.GetDevices(type))
+        foreach (var device in devices)
         {
             target.Add(new AudioDeviceViewModel(device));
         }
@@ -136,10 +190,14 @@ public sealed partial class MainViewModel : ObservableObject
             d.IsDefault = string.Equals(d.Id, deviceId, StringComparison.OrdinalIgnoreCase);
     }
 
+    // COM notifications arrive on background threads — marshal to the UI thread.
+    // Must be BeginInvoke, not Invoke: IMMNotificationClient callbacks may not
+    // block, and a synchronous wait here deadlocks against a UI thread that is
+    // re-entering MMDevAPI (enumeration, or Dispose's callback unregistration).
+
     private void OnDefaultDeviceChanged(object? sender, DefaultDeviceChangedEventArgs e)
     {
-        // COM notifications arrive on background threads — marshal to the UI thread.
-        Application.Current.Dispatcher.Invoke(() =>
+        Application.Current?.Dispatcher.BeginInvoke(() =>
         {
             var collection = e.DeviceType == AudioDeviceType.Output ? OutputDevices : InputDevices;
             MarkDefault(collection, e.DeviceId);
@@ -148,6 +206,6 @@ public sealed partial class MainViewModel : ObservableObject
 
     private void OnDeviceStateChanged(object? sender, DeviceStateChangedEventArgs e)
     {
-        Application.Current.Dispatcher.Invoke(() => RefreshDevices());
+        Application.Current?.Dispatcher.BeginInvoke(() => RefreshDevices());
     }
 }

@@ -1,3 +1,4 @@
+using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Interop;
 using AudioDevSwitcher.Core.Models;
@@ -51,14 +52,31 @@ public partial class App : Application
 
     private void CycleOutputDevice()
     {
-        var next = _audioService?.CycleDevice(AudioDeviceType.Output);
+        AudioDevice? next;
+        try
+        {
+            next = _audioService?.CycleDevice(AudioDeviceType.Output);
+        }
+        catch (COMException)
+        {
+            // A device vanished mid-cycle; the next hotkey press retries.
+            return;
+        }
+
         if (next is not null && _settingsService?.Settings.PlayConfirmationTone == true)
             ConfirmationTonePlayer.PlayAsync();
     }
 
     private void CycleInputDevice()
     {
-        _audioService?.CycleDevice(AudioDeviceType.Input);
+        try
+        {
+            _audioService?.CycleDevice(AudioDeviceType.Input);
+        }
+        catch (COMException)
+        {
+            // A device vanished mid-cycle; the next hotkey press retries.
+        }
     }
 
     protected override void OnExit(ExitEventArgs e)

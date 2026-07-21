@@ -140,11 +140,21 @@ public sealed partial class MainViewModel : ObservableObject
     [RelayCommand]
     private void RefreshDevices()
     {
+        // Rebuilding the collections resets the ListView selection; keep the
+        // user's selected row when its device survives the refresh, otherwise
+        // fall back to highlighting the default device.
+        var prevOutputId = SelectedOutputDevice?.Id;
+        var prevInputId = SelectedInputDevice?.Id;
+
         LoadDevices(AudioDeviceType.Output, OutputDevices);
         LoadDevices(AudioDeviceType.Input, InputDevices);
 
-        SelectedOutputDevice = OutputDevices.FirstOrDefault(d => d.IsDefault);
-        SelectedInputDevice = InputDevices.FirstOrDefault(d => d.IsDefault);
+        SelectedOutputDevice =
+            OutputDevices.FirstOrDefault(d => string.Equals(d.Id, prevOutputId, StringComparison.OrdinalIgnoreCase))
+            ?? OutputDevices.FirstOrDefault(d => d.IsDefault);
+        SelectedInputDevice =
+            InputDevices.FirstOrDefault(d => string.Equals(d.Id, prevInputId, StringComparison.OrdinalIgnoreCase))
+            ?? InputDevices.FirstOrDefault(d => d.IsDefault);
     }
 
     private void PlayToneIfEnabled()

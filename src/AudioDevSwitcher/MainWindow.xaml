@@ -26,6 +26,7 @@
 
         <ListView Grid.Row="1" x:Name="OutputList"
                   ItemsSource="{Binding OutputDevices}"
+                  SelectedItem="{Binding SelectedOutputDevice, Mode=TwoWay}"
                   SelectionMode="Single"
                   Margin="0,0,0,16">
             <ListView.ItemTemplate>
@@ -57,6 +58,7 @@
 
         <ListView Grid.Row="3" x:Name="InputList"
                   ItemsSource="{Binding InputDevices}"
+                  SelectedItem="{Binding SelectedInputDevice, Mode=TwoWay}"
                   SelectionMode="Single"
                   Margin="0,0,0,16">
             <ListView.ItemTemplate>

@@ -58,6 +58,11 @@ public sealed class SettingsService : ISettingsService
     public void Save()
     {
         var json = JsonSerializer.Serialize(Settings, JsonOptions);
-        File.WriteAllText(_path, json);
+
+        // Write-then-move so an interruption (process kill, session-end
+        // termination, power loss) can never leave a truncated settings.json.
+        var tmp = _path + ".tmp";
+        File.WriteAllText(tmp, json);
+        File.Move(tmp, _path, overwrite: true);
     }
 }

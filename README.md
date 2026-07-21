@@ -54,8 +54,15 @@ dotnet publish src/AudioDevSwitcher -c Release -r win-x64 --self-contained false
 The executable lands at `publish/AudioDevSwitcher.exe`. For a fully portable single-file build (no .NET install needed on the target machine):
 
 ```bash
-dotnet publish src/AudioDevSwitcher -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -o publish
+dotnet publish src/AudioDevSwitcher -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -o publish-standalone
 ```
+
+`IncludeNativeLibrariesForSelfExtract` matters: without it, WPF's native DLLs
+(`PresentationNative_cor3.dll` and friends) are left as loose files next to the
+exe, and copying "just the exe" to another machine crashes silently on launch.
+With the flag, `publish-standalone/AudioDevSwitcher.exe` is the only file you
+need to distribute. Using a separate output folder keeps the two publish
+flavors from overwriting each other.
 
 ### Making a Shortcut
 

@@ -1,5 +1,6 @@
 using System.Reflection;
 using System.Windows;
+using AudioDevSwitcher.Helpers;
 using AudioDevSwitcher.ViewModels;
 
 namespace AudioDevSwitcher;
@@ -26,6 +27,8 @@ public partial class MainWindow : Window
         InitializeComponent();
         Title = AppName;
         VersionLabel.Text = AppVersion;
+        OutputHotkeyHint.Text = $"Cycle: {GlobalHotkeyHelper.CycleOutputGesture}";
+        InputHotkeyHint.Text = $"Cycle: {GlobalHotkeyHelper.CycleInputGesture}";
 
         OutputList.MouseDoubleClick += (_, _) =>
         {

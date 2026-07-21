@@ -18,6 +18,10 @@ public sealed class GlobalHotkeyHelper : IDisposable
     private const int HOTKEY_CYCLE_OUTPUT = 1;
     private const int HOTKEY_CYCLE_INPUT = 2;
 
+    // Display strings for UI hints; keep in sync with the Register calls below.
+    public const string CycleOutputGesture = "Ctrl+Alt+PgUp";
+    public const string CycleInputGesture = "Ctrl+Alt+PgDn";
+
     [DllImport("user32.dll", SetLastError = true)]
     private static extern bool RegisterHotKey(IntPtr hWnd, int id, int modifiers, int vk);
 

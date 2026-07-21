@@ -18,7 +18,11 @@
         </Grid.RowDefinitions>
 
         <!-- Output Devices -->
-        <TextBlock Grid.Row="0" Text="Output Devices" FontSize="18" FontWeight="SemiBold" Margin="0,0,0,8"/>
+        <DockPanel Grid.Row="0" Margin="0,0,0,8" LastChildFill="False">
+            <TextBlock Text="Output Devices" FontSize="18" FontWeight="SemiBold"/>
+            <TextBlock x:Name="OutputHotkeyHint" DockPanel.Dock="Right"
+                       Foreground="Gray" FontSize="11" VerticalAlignment="Bottom"/>
+        </DockPanel>
 
         <ListView Grid.Row="1" x:Name="OutputList"
                   ItemsSource="{Binding OutputDevices}"
@@ -45,7 +49,11 @@
         </ListView>
 
         <!-- Input Devices -->
-        <TextBlock Grid.Row="2" Text="Input Devices" FontSize="18" FontWeight="SemiBold" Margin="0,0,0,8"/>
+        <DockPanel Grid.Row="2" Margin="0,0,0,8" LastChildFill="False">
+            <TextBlock Text="Input Devices" FontSize="18" FontWeight="SemiBold"/>
+            <TextBlock x:Name="InputHotkeyHint" DockPanel.Dock="Right"
+                       Foreground="Gray" FontSize="11" VerticalAlignment="Bottom"/>
+        </DockPanel>
 
         <ListView Grid.Row="3" x:Name="InputList"
                   ItemsSource="{Binding InputDevices}"

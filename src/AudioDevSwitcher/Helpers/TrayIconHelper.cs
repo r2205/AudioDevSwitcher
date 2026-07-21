@@ -104,7 +104,10 @@ public sealed class TrayIconHelper : IDisposable
         }
 
         if (_trayIcon is not null)
-            _trayIcon.ToolTipText = $"{MainWindow.AppName}\nOutput: {deviceName}";
+            _trayIcon.ToolTipText =
+                $"{MainWindow.AppName}\nOutput: {deviceName}\n" +
+                $"{GlobalHotkeyHelper.CycleOutputGesture}: next output\n" +
+                $"{GlobalHotkeyHelper.CycleInputGesture}: next input";
     }
 
     /// <summary>

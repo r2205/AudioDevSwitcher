@@ -1,5 +1,8 @@
 using System.Reflection;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Input;
+using System.Windows.Media;
 using AudioDevSwitcher.Helpers;
 using AudioDevSwitcher.ViewModels;
 
@@ -30,17 +33,37 @@ public partial class MainWindow : Window
         OutputHotkeyHint.Text = $"Cycle: {GlobalHotkeyHelper.CycleOutputGesture}";
         InputHotkeyHint.Text = $"Cycle: {GlobalHotkeyHelper.CycleInputGesture}";
 
-        OutputList.MouseDoubleClick += (_, _) =>
+        OutputList.MouseDoubleClick += (_, e) =>
         {
-            if (OutputList.SelectedItem is AudioDeviceViewModel device)
+            if (GetDoubleClickedDevice(e) is AudioDeviceViewModel device)
                 ViewModel.SetOutputDeviceCommand.Execute(device);
         };
 
-        InputList.MouseDoubleClick += (_, _) =>
+        InputList.MouseDoubleClick += (_, e) =>
         {
-            if (InputList.SelectedItem is AudioDeviceViewModel device)
+            if (GetDoubleClickedDevice(e) is AudioDeviceViewModel device)
                 ViewModel.SetInputDeviceCommand.Execute(device);
         };
+    }
+
+    /// <summary>
+    /// Returns the device row a double-click landed on, or null. MouseDoubleClick
+    /// also fires for right-button double-clicks and for clicks on the list's
+    /// empty area or scrollbar; only a left-button double-click on an actual
+    /// row may switch devices.
+    /// </summary>
+    private static AudioDeviceViewModel? GetDoubleClickedDevice(MouseButtonEventArgs e)
+    {
+        if (e.ChangedButton != MouseButton.Left) return null;
+
+        for (var element = e.OriginalSource as DependencyObject; element is not null;
+             element = element is Visual ? VisualTreeHelper.GetParent(element) : LogicalTreeHelper.GetParent(element))
+        {
+            if (element is ListViewItem item)
+                return item.DataContext as AudioDeviceViewModel;
+        }
+
+        return null;
     }
 
     protected override void OnStateChanged(EventArgs e)

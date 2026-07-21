@@ -134,12 +134,24 @@ public sealed class AudioDeviceService : IAudioDeviceService, IMMNotificationCli
 
     void IMMNotificationClient.OnPropertyValueChanged(string deviceId, PropertyKey key)
     {
-        // We treat property changes as state changes so the UI can refresh.
+        // Property changes arrive in bursts (volume, format, jack state, …) and
+        // each forwarded event costs a full list rebuild downstream. Only the
+        // display-name properties affect anything we show, so drop the rest.
+        if (!IsDisplayNameKey(key)) return;
+
         DeviceStateChanged?.Invoke(this, new DeviceStateChangedEventArgs
         {
             DeviceId = deviceId,
             IsActive = true,
         });
+    }
+
+    private static bool IsDisplayNameKey(PropertyKey key)
+    {
+        var name = PropertyKeys.DeviceFriendlyName;
+        var desc = PropertyKeys.DeviceDescription;
+        return (key.FormatId == name.FormatId && key.PropertyId == name.PropertyId)
+            || (key.FormatId == desc.FormatId && key.PropertyId == desc.PropertyId);
     }
 
     // ── Private helpers ─────────────────────────────────────────────────

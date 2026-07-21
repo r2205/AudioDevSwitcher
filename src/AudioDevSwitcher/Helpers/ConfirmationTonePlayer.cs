@@ -13,20 +13,37 @@ public static class ConfirmationTonePlayer
     private const int DelayMs = 800;
     private static readonly byte[] ToneWav = BuildToneWav();
 
+    private static readonly object Gate = new();
+    private static CancellationTokenSource? _pending;
+
     public static void PlayAsync()
     {
+        // winmm's PlaySound is process-global: starting a tone stops whichever
+        // one is playing. Latest wins — a switch that supersedes a tone still
+        // waiting out its delay cancels it rather than stacking another. Two
+        // playbacks can then never overlap, because DelayMs is longer than the
+        // tone itself: by the time a successor starts, its predecessor is done.
+        CancellationToken token;
+        lock (Gate)
+        {
+            _pending?.Cancel();
+            _pending = new CancellationTokenSource();
+            token = _pending.Token;
+        }
+
         Task.Run(async () =>
         {
             try
             {
-                await Task.Delay(DelayMs);
+                await Task.Delay(DelayMs, token);
                 using var ms = new MemoryStream(ToneWav);
                 using var player = new SoundPlayer(ms);
                 player.PlaySync();
             }
             catch
             {
-                // Tone playback is a nicety; never surface errors to the user.
+                // Cancelled by a newer switch, or playback failed —
+                // the tone is a nicety; never surface errors to the user.
             }
         });
     }

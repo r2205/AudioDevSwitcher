@@ -12,6 +12,7 @@ public sealed class GlobalHotkeyHelper : IDisposable
     private const int WM_HOTKEY = 0x0312;
     private const int MOD_CONTROL = 0x0002;
     private const int MOD_ALT = 0x0001;
+    private const int MOD_NOREPEAT = 0x4000;
     private const int VK_PRIOR = 0x21;  // Page Up
     private const int VK_NEXT = 0x22;   // Page Down
 
@@ -45,8 +46,11 @@ public sealed class GlobalHotkeyHelper : IDisposable
         // Register and track each hotkey independently: a conflict on one combo
         // (another app already owns it) must not cost the user the other one,
         // and Dispose must unregister exactly what was registered.
-        _outputRegistered = RegisterHotKey(hwnd, HOTKEY_CYCLE_OUTPUT, MOD_CONTROL | MOD_ALT, VK_PRIOR);
-        _inputRegistered = RegisterHotKey(hwnd, HOTKEY_CYCLE_INPUT, MOD_CONTROL | MOD_ALT, VK_NEXT);
+        // MOD_NOREPEAT: cycling is not idempotent, so keyboard auto-repeat
+        // while the chord is held must not fire the hotkey again.
+        const int modifiers = MOD_CONTROL | MOD_ALT | MOD_NOREPEAT;
+        _outputRegistered = RegisterHotKey(hwnd, HOTKEY_CYCLE_OUTPUT, modifiers, VK_PRIOR);
+        _inputRegistered = RegisterHotKey(hwnd, HOTKEY_CYCLE_INPUT, modifiers, VK_NEXT);
     }
 
     /// <summary>

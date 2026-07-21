@@ -11,12 +11,14 @@ A lightweight Windows 11 system-tray app that lets you quickly switch your defau
 - **System tray icon** with a custom speaker glyph — always one click away
 - **Left-click** the tray icon to instantly cycle your output device
 - **Right-click** for a menu to open the full device list or exit
+- **Double-click** a device in the window to make it the default
 - **Global hotkeys** — switch without touching the mouse:
   - `Ctrl+Alt+Page Up` — cycle output device
   - `Ctrl+Alt+Page Down` — cycle input device
+  - Hints for both are shown next to the device lists and in the tray tooltip
 - **Real-time updates** — detects when devices are plugged in or removed
+- **Tooltip** shows the current default output device and the hotkeys
 - **Minimize/close to tray** — the app stays running in the background
-- **Tooltip** shows the current default output device
 - **Configurable settings** (persisted to `%APPDATA%\AudioDevSwitcher\settings.json`):
   - Start with Windows (adds a per-user `HKCU\...\Run` entry)
   - Start minimized to tray

@@ -70,7 +70,12 @@ public sealed class TrayIconHelper : IDisposable
     private void ShowWindow()
     {
         _mainWindow.Show();
-        _mainWindow.WindowState = WindowState.Normal;
+
+        // Undo minimize-to-tray, but leave a maximized window maximized —
+        // hiding to tray on close does not change WindowState.
+        if (_mainWindow.WindowState == WindowState.Minimized)
+            _mainWindow.WindowState = WindowState.Normal;
+
         _mainWindow.Activate();
     }
 
